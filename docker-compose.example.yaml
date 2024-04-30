@@ -6,9 +6,9 @@ services:
     entrypoint: [ "bash", "-c", "sleep 5 && nginx && supervisord && php-fpm8.2 -F"]
     volumes:
       - .:/usr/share/nginx/html
-      - ./cbc-docker-php7-nginx/ssl:/etc/nginx/certs
-      - ./cbc-docker-php7-nginx/nginx/site.conf:/etc/nginx/sites-enabled/default
-      - ./cbc-docker-php7-nginx/supervisor/laravel-worker.conf:/etc/supervisor/conf.d/laravel-worker.conf
+      - ./cbc-docker-php8-nginx/ssl:/etc/nginx/certs
+      - ./cbc-docker-php8-nginx/nginx/site.conf:/etc/nginx/sites-enabled/default
+      - ./cbc-docker-php8-nginx/supervisor/laravel-worker.conf:/etc/supervisor/conf.d/laravel-worker.conf
     networks:
       default:
         ipv4_address: 10.2.0.31
