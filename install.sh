@@ -31,6 +31,8 @@ REPO_NAME=$(basename $(pwd))
 
 if [[ "$DEV_MODE" == true ]]; then
 
+	composer --ignore-platform-reqs install
+
 	while true; do
 
 		D_CLASS=$((RANDOM % (250 - 100 + 1) + 100))
@@ -69,13 +71,13 @@ if [[ "$DEV_MODE" == true ]]; then
 
 	fi
 
-	composer --ignore-platform-reqs install
-
 	npm install
 
 	npm run dev
 
 else
+
+	composer install
 
 	if ! [ -f .env ]; then
 
@@ -84,8 +86,6 @@ else
 		php artisan key:generate
 
 	fi
-
-	composer install
 
 fi
 
