@@ -29,6 +29,8 @@ done
 
 REPO_NAME=$(basename $(pwd))
 
+REPO_NAME_SNAKE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
+
 if [[ "$DEV_MODE" == true ]]; then
 
 	composer --ignore-platform-reqs install
@@ -65,15 +67,25 @@ if [[ "$DEV_MODE" == true ]]; then
 
 		sed -i "s/cbc-laravel-php8/$REPO_NAME/g" .env
 
+		sed -i "s/cbc_laravel_php8/$REPO_NAME_SNAKE/g" .env
+
 		if [ "$(docker container inspect -f '{{.State.Running}}' $REPO_NAME)" != "true" ]; then dockerup; fi
 
 		art-docker key:generate
 
 	fi
 
+	if ! mysql -h"cbc-mariadb" -u"root" -e "USE $REPO_NAME_SNAKE;" 2>/dev/null; then
+
+        mysql -h"cbc-mariadb" -u"root" -e "CREATE DATABASE IF NOT EXISTS $REPO_NAME_SNAKE;"
+
+    fi
+
+    art-docker migrate
+
 	npm install
 
-	npm run dev
+	if npm run dev; then true; fi
 
 else
 
