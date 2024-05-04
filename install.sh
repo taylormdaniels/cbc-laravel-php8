@@ -61,6 +61,16 @@ if [[ "$DEV_MODE" == true ]]; then
 
 	fi
 
+	echo; echo
+
+	upcbcstack
+
+	repos; cd $REPO_NAME
+
+	dockerup
+
+	echo; echo
+
 	if ! [ -f .env ]; then
 
 		cp -f .env.docker .env
@@ -68,8 +78,6 @@ if [[ "$DEV_MODE" == true ]]; then
 		sed -i "s/cbc-laravel-php8/$REPO_NAME/g" .env
 
 		sed -i "s/cbc_laravel_php8/$REPO_NAME_SNAKE/g" .env
-
-		if [ "$(docker container inspect -f '{{.State.Running}}' $REPO_NAME)" != "true" ]; then dockerup; fi
 
 		art-docker key:generate
 
