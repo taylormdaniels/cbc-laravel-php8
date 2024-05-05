@@ -93,7 +93,7 @@ if [[ "$DEV_MODE" == true ]]; then
 
 	npm install
 
-	if npm run dev; then true; fi
+	#if npm run dev; then true; fi
 
 else
 
