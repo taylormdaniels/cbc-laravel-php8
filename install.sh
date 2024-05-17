@@ -91,11 +91,7 @@ if [[ "$DEV_MODE" == true ]]; then
 
     art-docker migrate
 
-	if npm install; then
-
-		#if npm run dev; then true; fi
-
-	fi
+	if npm install; then true; fi
 
 else
 
