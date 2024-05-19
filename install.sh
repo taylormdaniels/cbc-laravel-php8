@@ -6,6 +6,8 @@ shopt -s expand_aliases
 
 source ~/.bash_aliases
 
+unalias cp
+
 DEV_MODE=false
 
 while [[ "$#" -gt 0 ]]; do
@@ -33,6 +35,8 @@ REPO_NAME_SNAKE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
 
 if [[ "$DEV_MODE" == true ]]; then
 
+	dockerdown
+
 	composer --ignore-platform-reqs install
 
 	while true; do
@@ -45,27 +49,37 @@ if [[ "$DEV_MODE" == true ]]; then
 
 	done
 
-	if ! cat /etc/hosts | grep "$REPO_NAME"; then
+	while true; do
 
-		echo "$IP_ADDRESS      $REPO_NAME" | sudo tee -a /etc/hosts
+		HOST_LINE=$(cat /etc/hosts | grep -n -m 1 $REPO_NAME | cut -d : -f 1)
 
-	fi
+		if ! [[ -z $HOST_LINE ]]; then
 
-	if ! [ -f docker-compose.yaml ]; then
+			sudo sed -i "${HOST_LINE}d" /etc/hosts
 
-	 	cp -f docker-compose.example.yaml docker-compose.yaml
+		else
 
-	 	sed -i "s/10\.2\.0\.31/$IP_ADDRESS/g" docker-compose.yaml
+			break
 
-	 	sed -i "s/cbc-laravel-php8/$REPO_NAME/g" docker-compose.yaml
+		fi
 
-	fi
+	done
+
+	echo "$IP_ADDRESS      $REPO_NAME" | sudo tee -a /etc/hosts
+
+ 	cp -f docker-compose.example.yaml docker-compose.yaml
+
+ 	sed -i "s/10\.2\.0\.31/$IP_ADDRESS/g" docker-compose.yaml
+
+ 	sed -i "s/cbc-laravel-php8/$REPO_NAME/g" docker-compose.yaml
 
 	echo; echo
 
 	upcbcstack
 
 	repos; cd $REPO_NAME
+
+	sleep 5
 
 	dockerup
 
