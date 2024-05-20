@@ -35,7 +35,7 @@ REPO_NAME_SNAKE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
 
 if [[ "$DEV_MODE" == true ]]; then
 
-	dockerdown
+	if dockerls | grep $REPO_NAME; then dockerdown; fi
 
 	composer --ignore-platform-reqs install
 
