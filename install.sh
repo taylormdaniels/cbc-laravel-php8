@@ -2,9 +2,11 @@
 
 set -e
 
+source .bash_aliases
+
 shopt -s expand_aliases
 
-source ~/.bash_aliases
+if [[ "$(whoami)" == "root" ]]; then echo-red "Do NOT run with sudo!"; exit 1; fi
 
 unalias cp
 
@@ -36,6 +38,14 @@ REPO_NAME_SNAKE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
 if [[ "$DEV_MODE" == true ]]; then
 
 	if dockerls | grep $REPO_NAME; then dockerdown; fi
+
+	if ! dockerls | grep cbc-mariadb; then
+
+		upcbcstack
+
+		sleep 5
+
+	fi
 
 	composer --ignore-platform-reqs install
 
@@ -73,6 +83,16 @@ if [[ "$DEV_MODE" == true ]]; then
 
  	sed -i "s/cbc-laravel-php8/$REPO_NAME/g" docker-compose.yaml
 
+ 	dockerup
+
+ 	if ! mysql -h"cbc-mariadb" -u"root" -e "USE $REPO_NAME_SNAKE;" 2>/dev/null; then
+
+        mysql -h"cbc-mariadb" -u"root" -e "CREATE DATABASE IF NOT EXISTS $REPO_NAME_SNAKE;"
+
+    fi
+
+    art-docker migrate
+
 	echo; echo
 
 	if ! [ -f .env ]; then
@@ -83,14 +103,7 @@ if [[ "$DEV_MODE" == true ]]; then
 
 		sed -i "s/cbc_laravel_php8/$REPO_NAME_SNAKE/g" .env
 
-		# Generate a random 32 character string
-		APP_KEY=$(openssl rand -base64 1000 | tr -dc 'a-zA-Z0-9' | head -c 32)
-
-		# Define the new APP_KEY line
-		NEW_APP_KEY_LINE="APP_KEY=$APP_KEY"
-
-		# Replace the third line in the .env file with the new APP_KEY line
-		sed -i "3s/.*/$NEW_APP_KEY_LINE/" .env
+		art-docker key:generate
 
 	fi
 
@@ -115,3 +128,5 @@ chmod 777 storage/logs
 setfacl -m "default:group::rw" storage/logs
 
 chmod 777 bootstrap/cache
+
+touch is_installed
