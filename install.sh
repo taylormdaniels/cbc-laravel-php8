@@ -37,9 +37,13 @@ REPO_NAME_SNAKE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
 
 if [[ "$DEV_MODE" == true ]]; then
 
-	if dockerls | grep $REPO_NAME; then dockerdown; fi
+	if dockerls | grep $REPO_NAME > /dev/null; then
 
-	if ! dockerls | grep cbc-mariadb; then
+		dockerdown
+
+	fi
+
+	if ! dockerls | grep cbc-mariadb > /dev/null; then
 
 		upcbcstack
 
@@ -47,7 +51,11 @@ if [[ "$DEV_MODE" == true ]]; then
 
 	fi
 
-	composer --ignore-platform-reqs install
+	if [ ! -f "vendor/composer/installed.json" ]; then
+
+		composer --ignore-platform-reqs install
+
+	fi
 
 	while true; do
 
