@@ -85,16 +85,6 @@ if [[ "$DEV_MODE" == true ]]; then
 
  	dockerup
 
- 	if ! mysql -h"cbc-mariadb" -u"root" -e "USE $REPO_NAME_SNAKE;" 2>/dev/null; then
-
-        mysql -h"cbc-mariadb" -u"root" -e "CREATE DATABASE IF NOT EXISTS $REPO_NAME_SNAKE;"
-
-    fi
-
-    art-docker migrate
-
-	echo; echo
-
 	if ! [ -f .env ]; then
 
 		cp -f .env.docker .env
@@ -106,6 +96,16 @@ if [[ "$DEV_MODE" == true ]]; then
 		art-docker key:generate
 
 	fi
+
+	if ! mysql -h"cbc-mariadb" -u"root" -e "USE $REPO_NAME_SNAKE;" 2>/dev/null; then
+
+        mysql -h"cbc-mariadb" -u"root" -e "CREATE DATABASE IF NOT EXISTS $REPO_NAME_SNAKE;"
+
+    fi
+
+    art-docker migrate
+
+	echo; echo
 
 else
 
