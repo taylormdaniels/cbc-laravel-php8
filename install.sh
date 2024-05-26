@@ -33,6 +33,8 @@ done
 
 REPO_NAME=$(basename $(pwd))
 
+echo; echo-cyan "Installing $REPO_NAME ..."; echo-white
+
 REPO_NAME_SNAKE=$(echo "$REPO_NAME" | tr '[:upper:]' '[:lower:]' | tr '-' '_')
 
 if [[ "$DEV_MODE" == true ]]; then
